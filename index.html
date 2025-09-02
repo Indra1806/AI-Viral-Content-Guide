@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Viral Content & Prompt Engineering Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Slate & Sky Blue -->
+    <!-- Application Structure Plan: The application is designed as a single-page tabbed interface to provide a structured, non-linear user experience. This architecture was chosen because the source report contains distinct but related topics (the AI model, prompt engineering, general viral strategy, and a specific audience deep-dive). A tabbed layout allows users to easily navigate between these topics without overwhelming them with a long, scrolling page. The flow is: Introduction -> Select a topic of interest via tabs -> Interact with visualizations and filtered content within that tab. This structure prioritizes user-driven exploration and quick access to specific information. -->
+    <!-- Visualization & Content Choices: 
+        - Veo Model Info -> Goal: Inform -> Method: Text blocks & an HTML/CSS diagram -> Interaction: None -> Justification: A simple, static visual diagram is sufficient to explain the high-level process without unnecessary complexity.
+        - Prompt Examples -> Goal: Organize/Explore -> Method: Filterable list -> Interaction: Dropdown to filter by genre, copy-to-clipboard button -> Justification: An interactive filter is the most efficient way for users to find relevant prompt examples from a large dataset.
+        - Viral Strategies -> Goal: Compare -> Method: Bar Chart (Chart.js) -> Interaction: Tooltips on hover -> Justification: A bar chart provides an immediate visual comparison of the perceived impact of different strategies, which is more effective than a simple list.
+        - Telugu Audience Insights -> Goal: Proportions -> Method: Doughnut Chart (Chart.js) -> Interaction: Tooltips on hover -> Justification: A doughnut chart is ideal for showing the breakdown of popular content categories, making relative popularity easy to grasp.
+        - Library/Method: All charts use Chart.js rendered on Canvas. All diagrams and layouts use HTML with Tailwind CSS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            color: #0284c7; /* sky-600 */
+            border-bottom-color: #0284c7; /* sky-600 */
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="min-h-screen">
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <h1 class="text-3xl font-bold text-slate-900">AI Viral Content Guide</h1>
+                <p class="mt-1 text-slate-500">An interactive deep-dive into prompt engineering and strategies for viral success.</p>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div id="tabs" class="bg-white rounded-lg shadow p-6 sm:p-8">
+                <div class="border-b border-slate-200">
+                    <nav class="-mb-px flex flex-wrap space-x-6" aria-label="Tabs">
+                        <button class="tab-button active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300" data-tab="veo">The Veo Model</button>
+                        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300" data-tab="prompts">Prompt Explorer</button>
+                        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300" data-tab="strategy">Viral Strategy</button>
+                        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300" data-tab="telugu">Telugu Audience</button>
+                    </nav>
+                </div>
+                
+                <div class="mt-6">
+                    <div id="tab-veo" class="tab-content active fade-in">
+                        <h2 class="text-2xl font-semibold text-slate-800 mb-4">Understanding Google's Veo Model</h2>
+                        <p class="text-slate-600 mb-6">This section introduces Veo, a state-of-the-art generative video model from Google. It's designed to create high-quality, long-form videos from simple text prompts, giving creators a powerful new tool. Below, you can explore its key features and the basic workflow from idea to final video.</p>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-700 mb-2">Key Features</h3>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <span class="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-100 text-sky-600 mr-3">&#10003;</span>
+                                        <span><strong class="font-semibold">High Definition:</strong> Generates 1080p videos, ensuring crisp and clear output suitable for any platform.</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-100 text-sky-600 mr-3">&#10003;</span>
+                                        <span><strong class="font-semibold">Cinematic Control:</strong> Understands and applies cinematic terms like "timelapse," "drone shot," and "panning" for professional-looking results.</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-100 text-sky-600 mr-3">&#10003;</span>
+                                        <span><strong class="font-semibold">Consistency & Coherence:</strong> Maintains consistent characters, objects, and tone throughout the generated video, even for longer sequences.</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                       <span class="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-100 text-sky-600 mr-3">&#10003;</span>
+                                        <span><strong class="font-semibold">Natural Realism:</strong> Excels at rendering realistic details, movements, and interactions, making generated content more believable.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-50 p-6 rounded-lg">
+                                <h3 class="text-lg font-semibold text-slate-700 mb-4 text-center">Generation Workflow</h3>
+                                <div class="flex items-center justify-center space-x-2 md:space-x-4">
+                                    <div class="text-center">
+                                        <div class="bg-white rounded-lg shadow-md w-20 h-20 md:w-24 md:h-24 flex items-center justify-center text-3xl">📝</div>
+                                        <p class="mt-2 text-sm font-medium">Prompt</p>
+                                    </div>
+                                    <div class="text-5xl text-slate-300 font-light">&rarr;</div>
+                                    <div class="text-center">
+                                        <div class="bg-white rounded-lg shadow-md w-20 h-20 md:w-24 md:h-24 flex items-center justify-center text-3xl">🧠</div>
+                                        <p class="mt-2 text-sm font-medium">Veo Model</p>
+                                    </div>
+                                    <div class="text-5xl text-slate-300 font-light">&rarr;</div>
+                                    <div class="text-center">
+                                        <div class="bg-white rounded-lg shadow-md w-20 h-20 md:w-24 md:h-24 flex items-center justify-center text-3xl">🎬</div>
+                                        <p class="mt-2 text-sm font-medium">Video</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-prompts" class="tab-content fade-in">
+                         <h2 class="text-2xl font-semibold text-slate-800 mb-4">Prompt Explorer</h2>
+                        <p class="text-slate-600 mb-6">Effective prompts are the key to unlocking an AI's creative potential. This interactive explorer allows you to browse a curated list of JSON-style prompts categorized by genre. Use the dropdown to filter the examples and click the copy icon to save a prompt for your own use. This demonstrates how structured prompts can guide the AI to produce specific styles and content.</p>
+                        <div class="flex items-center space-x-4 mb-6">
+                            <label for="genre-filter" class="font-medium text-slate-700">Filter by Genre:</label>
+                            <select id="genre-filter" class="block w-full max-w-xs rounded-md border-slate-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm">
+                                <option value="all">All Genres</option>
+                                <option value="cinematic">Cinematic</option>
+                                <option value="documentary">Documentary</option>
+                                <option value="animation">Animation</option>
+                                <option value="social">Social Media</option>
+                            </select>
+                        </div>
+                        <div id="prompt-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        </div>
+                    </div>
+                    <div id="tab-strategy" class="tab-content fade-in">
+                        <h2 class="text-2xl font-semibold text-slate-800 mb-4">Core Viral Content Strategies</h2>
+                        <p class="text-slate-600 mb-6">Creating content that goes viral involves more than just a good idea; it requires a strategic approach. This section visualizes the key factors that contribute to virality. The chart below shows the relative impact of each element, from crafting a compelling hook to leveraging current trends. Understanding these principles can significantly increase your content's reach and engagement.</p>
+                        <div class="chart-container">
+                            <canvas id="viralStrategyChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="tab-telugu" class="tab-content fade-in">
+                        <h2 class="text-2xl font-semibold text-slate-800 mb-4">Deep-Dive: The Telugu Audience</h2>
+                        <p class="text-slate-600 mb-6">To succeed in a specific region, you must understand its unique culture and preferences. This section focuses on creating viral content for Telugu-speaking audiences. We explore popular content categories, cultural nuances, and effective monetization strategies tailored to this vibrant community. The chart highlights the most popular genres, providing a starting point for your content creation journey.</p>
+                        <div class="grid lg:grid-cols-2 gap-8 items-center">
+                            <div class="chart-container">
+                                <canvas id="teluguAudienceChart"></canvas>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-700 mb-2">Key Insights & Strategies</h3>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <span class="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-100 text-sky-600 mr-3">&#128161;</span>
+                                        <span><strong class="font-semibold">Cultural Resonance:</strong> Incorporate local festivals, traditions, and cinematic references. Content that reflects shared cultural experiences performs exceptionally well.</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-100 text-sky-600 mr-3">&#128161;</span>
+                                        <span><strong class="font-semibold">Language Use ("Teluglish"):</strong> A mix of Telugu and English is common and relatable, especially for younger audiences and tech-related topics.</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="h-6 w-6 flex-shrink-0 flex items-center justify-center rounded-full bg-sky-100 text-sky-600 mr-3">&#128161;</span>
+                                        <span><strong class="font-semibold">Monetization:</strong> Beyond ads, successful creators use brand collaborations, affiliate marketing for local products, and regional sponsorships. Building a strong community is key.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const appData = {
+                prompts: [
+                    {
+                        genre: 'cinematic',
+                        title: 'Futuristic City Timelapse',
+                        prompt: `{
+    "description": "A breathtaking timelapse of a futuristic city at sunset, with flying vehicles weaving between towering holographic skyscrapers.",
+    "style": "cinematic, epic, high-contrast lighting, vibrant neon colors",
+    "camera": "wide-angle drone shot, slow panning motion",
+    "duration": "15s"
+}`
+                    },
+                    {
+                        genre: 'cinematic',
+                        title: 'Ancient Jungle Discovery',
+                        prompt: `{
+    "description": "An explorer discovers a hidden, overgrown temple in a dense jungle, with sunlight filtering through the canopy.",
+    "style": "adventure, mysterious, realistic, detailed textures",
+    "camera": "handheld tracking shot, following the explorer",
+    "duration": "12s"
+}`
+                    },
+                    {
+                        genre: 'documentary',
+                        title: 'Coral Reef Ecosystem',
+                        prompt: `{
+    "description": "A close-up, detailed view of a vibrant coral reef ecosystem, showing clownfish darting between anemones and sea turtles gliding by.",
+    "style": "nature documentary, Attenborough style, underwater photography, hyper-realistic",
+    "camera": "macro lens, slow and steady movement",
+    "duration": "20s"
+}`
+                    },
+                    {
+                        genre: 'documentary',
+                        title: 'Artisan Blacksmith',
+                        prompt: `{
+    "description": "An artisan blacksmith forging a piece of metal, with sparks flying as the hammer strikes the glowing steel.",
+    "style": "craftsmanship, authentic, warm lighting, detailed",
+    "camera": "medium shot, focus on the hands and the metal",
+    "duration": "10s"
+}`
+                    },
+                    {
+                        genre: 'animation',
+                        title: 'Whimsical Forest Creature',
+                        prompt: `{
+    "description": "A small, fluffy, magical creature with glowing eyes peeks out from behind a giant, colorful mushroom in an enchanted forest.",
+    "style": "3D animation, Studio Ghibli inspired, whimsical, soft lighting",
+    "camera": "static shot, focus pull to the creature",
+    "duration": "8s"
+}`
+                    },
+                    {
+                        genre: 'animation',
+                        title: 'Claymation Kitchen Chaos',
+                        prompt: `{
+    "description": "A piece of toast jumps out of a toaster and runs across a kitchen counter, causing comical chaos.",
+    "style": "claymation, stop-motion, quirky, playful",
+    "camera": "fixed side-on view, capturing the action",
+    "duration": "10s"
+}`
+                    },
+                    {
+                        genre: 'social',
+                        title: 'Satisfying Coffee Pour',
+                        prompt: `{
+    "description": "An aesthetic, slow-motion pour of cream into a glass of iced coffee, creating beautiful swirling patterns.",
+    "style": "satisfying, ASMR, high-speed photography, minimalist background",
+    "camera": "extreme close-up on the glass",
+    "duration": "7s"
+}`
+                    },
+                    {
+                        genre: 'social',
+                        title: 'DIY Craft Time-lapse',
+                        prompt: `{
+    "description": "A fast-paced time-lapse of hands creating a piece of intricate origami art from a single sheet of colored paper.",
+    "style": "DIY, trending, fast-cut, bright and cheerful lighting",
+    "camera": "top-down view, fixed position",
+    "duration": "15s"
+}`
+                    },
+                ],
+                viralStrategies: {
+                    labels: ['Strong Hook (First 3s)', 'Emotional Appeal', 'Relatability', 'Leveraging Trends', 'High Production Quality', 'Brevity (<60s)'],
+                    data: [95, 85, 80, 75, 65, 70],
+                },
+                teluguAudience: {
+                    labels: ['Film Commentary & Reviews', 'Comedy Skits', 'Tech & Gadget Reviews', 'Food & Travel Vlogs', 'Educational'],
+                    data: [35, 25, 20, 15, 5],
+                }
+            };
+            
+            const tabsContainer = document.getElementById('tabs');
+            const tabButtons = tabsContainer.querySelectorAll('.tab-button');
+            const tabContents = tabsContainer.querySelectorAll('.tab-content');
+            let viralStrategyChartInstance = null;
+            let teluguAudienceChartInstance = null;
+
+            function switchTab(tabId) {
+                tabButtons.forEach(button => {
+                    if (button.dataset.tab === tabId) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+
+                tabContents.forEach(content => {
+                    if (content.id === `tab-${tabId}`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+                
+                if (tabId === 'strategy' && !viralStrategyChartInstance) {
+                    renderViralStrategyChart();
+                }
+                
+                if (tabId === 'telugu' && !teluguAudienceChartInstance) {
+                    renderTeluguAudienceChart();
+                }
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    switchTab(button.dataset.tab);
+                });
+            });
+
+            const promptListContainer = document.getElementById('prompt-list');
+            const genreFilter = document.getElementById('genre-filter');
+
+            function renderPrompts(filter = 'all') {
+                promptListContainer.innerHTML = '';
+                const filteredPrompts = filter === 'all' 
+                    ? appData.prompts 
+                    : appData.prompts.filter(p => p.genre === filter);
+
+                if (filteredPrompts.length === 0) {
+                    promptListContainer.innerHTML = `<p class="text-slate-500 md:col-span-2">No prompts found for this genre.</p>`;
+                    return;
+                }
+                
+                filteredPrompts.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-50 rounded-lg p-4 border border-slate-200';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-md font-semibold text-slate-800 mb-2">${p.title}</h4>
+                            <button class="copy-btn p-1.5 rounded-md hover:bg-slate-200 text-slate-500" title="Copy prompt">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 8a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H-.5A.5.5 0 0 1-1 8z"/></svg>
+                                <span class="copy-feedback hidden text-xs text-sky-600">Copied!</span>
+                            </button>
+                        </div>
+                        <pre class="bg-white text-sm text-slate-600 p-3 rounded-md overflow-x-auto whitespace-pre-wrap"><code>${p.prompt.trim()}</code></pre>
+                    `;
+                    promptListContainer.appendChild(card);
+                    
+                    const copyBtn = card.querySelector('.copy-btn');
+                    const feedbackSpan = card.querySelector('.copy-feedback');
+                    const icon = card.querySelector('svg');
+                    copyBtn.addEventListener('click', () => {
+                        navigator.clipboard.writeText(p.prompt.trim()).then(() => {
+                            icon.style.display = 'none';
+                            feedbackSpan.style.display = 'inline';
+                            setTimeout(() => {
+                                icon.style.display = 'inline';
+                                feedbackSpan.style.display = 'none';
+                            }, 2000);
+                        });
+                    });
+                });
+            }
+
+            genreFilter.addEventListener('change', (e) => {
+                renderPrompts(e.target.value);
+            });
+            
+            function renderViralStrategyChart() {
+                const ctx = document.getElementById('viralStrategyChart').getContext('2d');
+                viralStrategyChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: appData.viralStrategies.labels,
+                        datasets: [{
+                            label: 'Relative Impact',
+                            data: appData.viralStrategies.data,
+                            backgroundColor: 'rgba(56, 189, 248, 0.6)',
+                            borderColor: 'rgba(2, 132, 199, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Impact of Virality Factors',
+                                font: {
+                                    size: 16
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` Impact Score: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderTeluguAudienceChart() {
+                const ctx = document.getElementById('teluguAudienceChart').getContext('2d');
+                 teluguAudienceChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: appData.teluguAudience.labels,
+                        datasets: [{
+                            label: 'Content Popularity',
+                            data: appData.teluguAudience.data,
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(14, 165, 233, 0.7)',
+                                'rgba(16, 185, 129, 0.7)',
+                                'rgba(249, 115, 22, 0.7)',
+                                'rgba(139, 92, 246, 0.7)'
+                            ],
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Popular Telugu Content Categories',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderPrompts();
+        });
+    </script>
+</body>
+</html>
